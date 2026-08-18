@@ -85,8 +85,6 @@ No dependencies are required.
 
 Open either `part1.html` or `part2.html` directly in a browser.
 
-## Interview Explanation
-
 The main engineering decision in Part 2 is separating **time measurement** from **UI updates**.
 
 `setInterval()` is not treated as the clock. The actual remaining time is calculated from timestamps, while the interval only refreshes the displayed value.
