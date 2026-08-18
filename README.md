@@ -85,7 +85,7 @@ No dependencies are required.
 
 Open either `part1.html` or `part2.html` directly in a browser.
 
-## Interview Explanation
+
 
 The main engineering decision in Part 2 is separating **time measurement** from **UI updates**.
 
