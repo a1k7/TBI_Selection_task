@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Countdown Timer - Part 2</title>
+</head>
+
+<body>
+
+    <h1>Countdown Timer</h1>
+
+    <div id="timer">10:00</div>
+
+    <button id="startBtn">Start</button>
+    <button id="pauseBtn" disabled>Pause</button>
+
+    <script>
+        const timer = document.getElementById("timer");
+        const startBtn = document.getElementById("startBtn");
+        const pauseBtn = document.getElementById("pauseBtn");
+
+        const durationMs = 10 * 60 * 1000;
+
+        let remainingMs = durationMs;
+        let deadline = null;
+        let intervalId = null;
+        let isRunning = false;
+
+        function updateDisplay() {
+            const totalSeconds = Math.max(0, Math.ceil(remainingMs / 1000));
+
+            const minutes = Math.floor(totalSeconds / 60);
+            const seconds = totalSeconds % 60;
+
+            const displayMinutes = String(minutes).padStart(2, "0");
+            const displaySeconds = String(seconds).padStart(2, "0");
+
+            timer.innerText = `${displayMinutes}:${displaySeconds}`;
+        }
+
+        function stopInterval() {
+            if (intervalId !== null) {
+                clearInterval(intervalId);
+                intervalId = null;
+            }
+        }
+
+        function updateRemainingTime() {
+            if (!isRunning || deadline === null) {
+                return;
+            }
+
+            remainingMs = deadline - Date.now();
+
+            if (remainingMs <= 0) {
+                remainingMs = 0;
+                isRunning = false;
+                deadline = null;
+
+                stopInterval();
+
+                startBtn.disabled = true;
+                pauseBtn.disabled = true;
+                pauseBtn.innerText = "Pause";
+
+                updateDisplay();
+                return;
+            }
+
+            updateDisplay();
+        }
+
+        function startTimer() {
+            if (isRunning || remainingMs <= 0) {
+                return;
+            }
+
+            isRunning = true;
+
+            // Create a deadline from the remaining time.
+            deadline = Date.now() + remainingMs;
+
+            startBtn.disabled = true;
+            pauseBtn.disabled = false;
+            pauseBtn.innerText = "Pause";
+
+            // Update immediately instead of waiting one second.
+            updateRemainingTime();
+
+            // The interval only refreshes the display.
+            intervalId = setInterval(updateRemainingTime, 250);
+        }
+
+        function pauseTimer() {
+            if (!isRunning) {
+                return;
+            }
+
+            // Calculate the actual remaining time before stopping.
+            updateRemainingTime();
+
+            if (!isRunning) {
+                return;
+            }
+
+            remainingMs = Math.max(0, deadline - Date.now());
+
+            isRunning = false;
+            deadline = null;
+
+            stopInterval();
+
+            startBtn.disabled = false;
+            pauseBtn.disabled = true;
+            pauseBtn.innerText = "Resume";
+
+            updateDisplay();
+        }
+
+        startBtn.addEventListener("click", startTimer);
+        pauseBtn.addEventListener("click", pauseTimer);
+
+        // If the tab becomes visible again, immediately recalculate
+        // the remaining time from the deadline.
+        document.addEventListener("visibilitychange", () => {
+            if (document.visibilityState === "visible") {
+                updateRemainingTime();
+            }
+        });
+
+        // Initial display.
+        updateDisplay();
+    </script>
+
+</body>
+</html>
